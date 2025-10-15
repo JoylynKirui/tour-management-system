@@ -613,27 +613,150 @@ from weasyprint import HTML
 from django.conf import settings
 import tempfile
 import os
+# add at top of file if not already present
+from decimal import Decimal
+from django.template.loader import get_template
+from weasyprint import HTML
+import tempfile
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from .models import Booking, Destination, TravelLeg, Traveler
 
+@login_required
 def booking_pdf(request, pk):
-    booking = Booking.objects.get(pk=pk)
-    travel_legs = booking.travel_legs.all()
+    """
+    Generate a PDF for booking pk that includes:
+     - per-destination totals (accommodation, activities, dining, transport)
+     - per-traveler totals (overall and per-destination)
+     - booking subtotal/grand total
+    """
+    booking = get_object_or_404(Booking.objects.select_related("client"), pk=pk)
+
+    # Gather destinations ordered by start_date
+    destinations = booking.destinations.all().order_by("start_date") \
+        .prefetch_related("stays", "activities", "dining_expenses", "arriving_legs", "departing_legs", "galleries")
+
+    # Travel legs for booking
+    travel_legs = booking.travel_legs.all().select_related("from_destination", "to_destination")
+
+    # Overall booking-level totals (use model methods where possible)
+    booking_costs = booking.cost_breakdown()  # returns dict with Accommodation, Activities, Dining, Transport, Total
+
+    # Calculate per-destination totals + per-traveler totals for each destination
+    dests_context = []
+    for dest in destinations:
+        # Accommodation total for this destination
+        accom_total = sum((s.total_cost or Decimal("0.00")) for s in dest.stays.all())
+
+        # Activities total
+        activities_total = sum((a.cost or Decimal("0.00")) for a in dest.activities.all())
+
+        # Dining total
+        dining_total = sum((d.cost or Decimal("0.00")) for d in dest.dining_expenses.all())
+
+        # Transport: arriving + departing legs cost
+        arriving = dest.arriving_legs.all()
+        departing = dest.departing_legs.all()
+        transport_total = sum((leg.cost or Decimal("0.00")) for leg in arriving) + sum((leg.cost or Decimal("0.00")) for leg in departing)
+
+        dest_total = accom_total + activities_total + dining_total + transport_total
+
+        # Per-traveler totals for this destination
+        traveler_rows = []
+        for t in booking.travelers.all():
+            stay_total = sum((s.total_cost or Decimal("0.00")) for s in dest.stays.filter(travelers=t))
+            act_total = sum((a.cost or Decimal("0.00")) for a in dest.activities.filter(travelers=t))
+            dining_total_t = sum((d.cost or Decimal("0.00")) for d in dest.dining_expenses.filter(travelers=t))
+            transport_total_t = sum((leg.cost or Decimal("0.00")) for leg in arriving.filter(travelers=t)) + sum((leg.cost or Decimal("0.00")) for leg in departing.filter(travelers=t))
+            total_t = stay_total + act_total + dining_total_t + transport_total_t
+
+            traveler_rows.append({
+                "traveler": t,
+                "Accommodation": stay_total,
+                "Activities": act_total,
+                "Dining": dining_total_t,
+                "Transport": transport_total_t,
+                "Total": total_t,
+            })
+
+        dests_context.append({
+            "destination": dest,
+            "Accommodation": accom_total,
+            "Activities": activities_total,
+            "Dining": dining_total,
+            "Transport": transport_total,
+            "Total": dest_total,
+            "traveler_costs": traveler_rows,
+            "galleries": dest.galleries.all(),
+        })
+
+    # Per-traveler totals for entire booking
+    booking_traveler_costs = []
+    for t in booking.travelers.all():
+        stay_total = sum((s.total_cost or Decimal("0.00")) for dest in destinations for s in dest.stays.filter(travelers=t))
+        act_total = sum((a.cost or Decimal("0.00")) for dest in destinations for a in dest.activities.filter(travelers=t))
+        dining_total = sum((d.cost or Decimal("0.00")) for dest in destinations for d in dest.dining_expenses.filter(travelers=t))
+        travel_total = sum((leg.cost or Decimal("0.00")) for leg in booking.travel_legs.filter(travelers=t))
+        total = stay_total + act_total + dining_total + travel_total
+
+        booking_traveler_costs.append({
+            "traveler": t,
+            "Accommodation": stay_total,
+            "Activities": act_total,
+            "Dining": dining_total,
+            "Transport": travel_total,
+            "Total": total,
+        })
+
+    # Final booking totals: use model .grand_total() but ensure Decimal consistent
+    subtotal = booking_costs.get("Total", Decimal("0.00"))
+    # If you ever add taxes/fees, compute here and set grand_total accordingly
+    grand_total = subtotal
 
     template = get_template("tour/booking_pdf.html")
     html_string = template.render({
         "booking": booking,
+        "destinations": dests_context,
         "travel_legs": travel_legs,
+        "booking_costs": booking_costs,
+        "booking_traveler_costs": booking_traveler_costs,
+        "subtotal": subtotal,
+        "grand_total": grand_total,
+        "generated_on": timezone.now(),
+        # add site name or logo path if you need it e.g. "logo_path": settings.BASE_DIR / "static" / "img" / "logo.png"
     })
 
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        HTML(
-            string=html_string,
-            base_url=settings.BASE_DIR  # <-- filesystem root so static/media resolve
-        ).write_pdf(output.name)
-
+    # create PDF via weasyprint
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=True) as output:
+        HTML(string=html_string, base_url=settings.BASE_DIR).write_pdf(output.name)
         output.seek(0)
-        response = HttpResponse(output.read(), content_type="application/pdf")
-        response['Content-Disposition'] = f'attachment; filename="Booking_{booking.id}.pdf"'
-        return response
+        pdf_data = output.read()
+
+    response = HttpResponse(pdf_data, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="Booking_{booking.id}.pdf"'
+    return response
+
+# def booking_pdf(request, pk):
+#     booking = Booking.objects.get(pk=pk)
+#     travel_legs = booking.travel_legs.all()
+
+#     template = get_template("tour/booking_pdf.html")
+#     html_string = template.render({
+#         "booking": booking,
+#         "travel_legs": travel_legs,
+#     })
+
+#     with tempfile.NamedTemporaryFile(delete=True) as output:
+#         HTML(
+#             string=html_string,
+#             base_url=settings.BASE_DIR  # <-- filesystem root so static/media resolve
+#         ).write_pdf(output.name)
+
+#         output.seek(0)
+#         response = HttpResponse(output.read(), content_type="application/pdf")
+#         response['Content-Disposition'] = f'attachment; filename="Booking_{booking.id}.pdf"'
+#         return response
 
 
 

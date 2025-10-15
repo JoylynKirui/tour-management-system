@@ -1,178 +1,165 @@
-{% load static %}
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Booking Report #{{ booking.id }}</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #333;
-      line-height: 1.5;
-      font-size: 12px;
-    }
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Booking {{ booking.id }}</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        margin: 30px;
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 6px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+      }
+      th,
+      td {
+        padding: 6px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      .right {
+        text-align: right;
+      }
+      .small {
+        font-size: 11px;
+        color: #444;
+      }
+      .section {
+        page-break-inside: avoid;
+        margin-bottom: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Booking #{{ booking.id }}</h1>
+      <p class="small">
+        Client: {{ booking.client.first_name }} {{ booking.client.last_name }} —
+        Created: {{ booking.created_at|date:"Y-m-d H:i" }}
+      </p>
+    </header>
 
-    .page {
-      width: 100%;
-      margin: 0 auto;
-      background: white;
-    }
-
-    /* --- HERO --- */
-    .hero {
-      width: 100%;
-      height: 120px;
-      background: url("file://{{ STATIC_ROOT }}/hero.jpg") 
-                  no-repeat center center;
-      background-size: cover;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      color: #fff;
-    }
-    .hero h1 {
-      font-size: 20px;
-      margin: 0;
-      background: rgba(0,0,0,0.5);
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-    }
-    .hero p {
-      font-size: 12px;
-      margin: 6px 0 0;
-      background: rgba(0,0,0,0.4);
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    /* --- CONTENT --- */
-    .content {
-      max-width: 170mm;
-      margin: 0 auto;
-      padding: 15mm 10mm;
-    }
-    .section {
-      margin-bottom: 18px;
-      page-break-inside: avoid;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #003366;
-      padding-bottom: 4px;
-      color: #003366;
-    }
-
-    p { margin: 3px 0; }
-
-    /* --- TABLES --- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 5px;
-      font-size: 11.5px;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 5px 6px;
-    }
-    th { background: #eaeaea; }
-    .text-end { text-align: right; }
-    .text-center { text-align: center; }
-
-    /* --- TWO-COLUMN --- */
-    .two-col-content {
-      width: 100%;
-    }
-    .two-col-content td {
-      vertical-align: top;
-      padding: 0 6px 10px 0;
-      width: 50%;
-    }
-    .item-card {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 6px;
-      background: #fafafa;
-    }
-    .item-card img {
-      width: 100%;
-      height: 50mm;
-      object-fit: cover;
-      margin-bottom: 5px;
-      display: block;
-    }
-    .item-card h4 {
-      font-size: 12.5px;
-      margin: 2px 0;
-      color: #003366;
-    }
-    .item-card p {
-      font-size: 11.5px;
-      margin: 1px 0;
-    }
-  </style>
-</head>
-<body>
-
-<div class="page">
-
-  <!-- HERO -->
-  <div class="hero">
-    <h1>Africa's Leading Tour Management System</h1>
-    <p>Plan, organize, and enjoy seamless travel experiences with <strong>Nomad</strong>.</p>
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-    <!-- Client Info -->
-    <div class="section">
-      <div class="section-title">Client Information</div>
-      <p><strong>Client:</strong> {{ booking.client.first_name }} {{ booking.client.last_name }}</p>
-      <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
-      <p><strong>End Date:</strong> {{ booking.end_date }}</p>
-    </div>
-
-    <!-- Cost Breakdown -->
-    <div class="section">
-      <div class="section-title">Cost Breakdown</div>
-      {% with breakdown=booking.cost_breakdown %}
+    <section class="section">
+      <h2>Summary</h2>
       <table>
         <thead>
           <tr>
             <th>Category</th>
-            <th class="text-end">Cost</th>
+            <th class="right">Amount (USD)</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>Accommodation</td><td class="text-end">KSH {{ breakdown.Accommodation }}</td></tr>
-          <tr><td>Activities</td><td class="text-end">KSH {{ breakdown.Activities }}</td></tr>
-          <tr><td>Dining</td><td class="text-end">KSH {{ breakdown.Dining }}</td></tr>
-          <tr><td>Transport</td><td class="text-end">KSH {{ breakdown.Transport }}</td></tr>
-          <tr><td><strong>Total</strong></td><td class="text-end"><strong>KSH {{ breakdown.Total }}</strong></td></tr>
+          <tr>
+            <td>Accommodation</td>
+            <td class="right">
+              {{ booking_costs.Accommodation|floatformat:2 }}
+            </td>
+          </tr>
+          <tr>
+            <td>Activities</td>
+            <td class="right">{{ booking_costs.Activities|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Dining</td>
+            <td class="right">{{ booking_costs.Dining|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Transport</td>
+            <td class="right">{{ booking_costs.Transport|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <th>Total</th>
+            <th class="right">{{ grand_total|floatformat:2 }}</th>
+          </tr>
         </tbody>
       </table>
-      {% endwith %}
-    </div>
+    </section>
 
-    <!-- Travel Itinerary -->
-    <div class="section">
-      <div class="section-title">Travel Itinerary</div>
+    {% for d in destinations %}
+    <section class="section">
+      <h2>
+        Destination: {{ d.destination.name }} ({{ d.destination.start_date }} →
+        {{ d.destination.end_date }})
+      </h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th class="right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Accommodation</td>
+            <td class="right">{{ d.Accommodation|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Activities</td>
+            <td class="right">{{ d.Activities|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Dining</td>
+            <td class="right">{{ d.Dining|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Transport</td>
+            <td class="right">{{ d.Transport|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <th>Destination Total</th>
+            <th class="right">{{ d.Total|floatformat:2 }}</th>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Per-traveler breakdown</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Traveler</th>
+            <th class="right">Accommodation</th>
+            <th class="right">Activities</th>
+            <th class="right">Dining</th>
+            <th class="right">Transport</th>
+            <th class="right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in d.traveler_costs %}
+          <tr>
+            <td>{{ row.traveler.first_name }} {{ row.traveler.last_name }}</td>
+            <td class="right">{{ row.Accommodation|floatformat:2 }}</td>
+            <td class="right">{{ row.Activities|floatformat:2 }}</td>
+            <td class="right">{{ row.Dining|floatformat:2 }}</td>
+            <td class="right">{{ row.Transport|floatformat:2 }}</td>
+            <td class="right">
+              <strong>{{ row.Total|floatformat:2 }}</strong>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endfor %}
+
+    <section class="section">
+      <h2>Travel legs</h2>
       <table>
         <thead>
           <tr>
             <th>Date</th>
             <th>Mode</th>
-            <th>From</th>
-            <th>To</th>
-            <th class="text-end">Cost</th>
+            <th>From → To</th>
+            <th class="right">Cost</th>
           </tr>
         </thead>
         <tbody>
@@ -180,68 +167,46 @@
           <tr>
             <td>{{ leg.date }}</td>
             <td>{{ leg.mode }}</td>
-            <td>{{ leg.from_location }}{% if leg.from_destination %} ({{ leg.from_destination.name }}){% endif %}</td>
-            <td>{{ leg.to_location }}{% if leg.to_destination %} ({{ leg.to_destination.name }}){% endif %}</td>
-            <td class="text-end">KSH {{ leg.cost }}</td>
+            <td>{{ leg.from_location }} → {{ leg.to_location }}</td>
+            <td class="right">{{ leg.cost|floatformat:2 }}</td>
           </tr>
-          {% empty %}
-          <tr><td colspan="5" class="text-center">No travel legs added yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
-    </div>
+    </section>
 
-    <!-- Destinations -->
-    <div class="section">
-      <div class="section-title">Destinations</div>
-      <table class="two-col-content">
-        <tr>
-          {% for d in booking.destinations.all %}
-          <td>
-            <div class="item-card">
-              {% if d.galleries.first %}
-                <img src="file://{{ d.galleries.first.image.path }}" alt="{{ d.name }}">
-              {% endif %}
-              <h4>{{ d.name }}</h4>
-              <p><em>{{ d.start_date }} → {{ d.end_date }}</em></p>
-              <p>{{ d.description }}</p>
-            </div>
-          </td>
-          {% if forloop.counter|divisibleby:2 %}</tr><tr>{% endif %}
-          {% empty %}
-          <td colspan="2">No destinations added yet.</td>
+    <section class="section">
+      <h2>Per-traveler totals (booking)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Traveler</th>
+            <th class="right">Accommodation</th>
+            <th class="right">Activities</th>
+            <th class="right">Dining</th>
+            <th class="right">Transport</th>
+            <th class="right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in booking_traveler_costs %}
+          <tr>
+            <td>{{ row.traveler.first_name }} {{ row.traveler.last_name }}</td>
+            <td class="right">{{ row.Accommodation|floatformat:2 }}</td>
+            <td class="right">{{ row.Activities|floatformat:2 }}</td>
+            <td class="right">{{ row.Dining|floatformat:2 }}</td>
+            <td class="right">{{ row.Transport|floatformat:2 }}</td>
+            <td class="right">
+              <strong>{{ row.Total|floatformat:2 }}</strong>
+            </td>
+          </tr>
           {% endfor %}
-        </tr>
+        </tbody>
       </table>
-    </div>
+    </section>
 
-    <!-- Restaurants -->
-    <div class="section">
-      <div class="section-title">Restaurants</div>
-      <table class="two-col-content">
-        <tr>
-          {% for d in booking.destinations.all %}
-            {% for r in d.restaurants.all %}
-              <td>
-                <div class="item-card">
-                  {% if r.image %}
-                    <img src="file://{{ r.image.path }}" alt="{{ r.name }}">
-                  {% endif %}
-                  <h4>{{ r.name }}</h4>
-                  <p>{{ r.description }}</p>
-                </div>
-              </td>
-              {% if forloop.counter|divisibleby:2 %}</tr><tr>{% endif %}
-            {% empty %}
-              <td colspan="2">No restaurants added yet.</td>
-            {% endfor %}
-          {% endfor %}
-        </tr>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-</body>
+    <footer>
+      <p class="small">Generated: {{ generated_on|date:"Y-m-d H:i" }}</p>
+    </footer>
+  </body>
 </html>
