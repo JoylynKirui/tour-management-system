@@ -1,5 +1,4 @@
-{% extends "main.html" %}
-{% block content %}
+{% extends "main.html" %} {% block content %}
 
 <style>
   body {
@@ -12,7 +11,9 @@
     padding: 0;
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     margin: 0 0 15px 0;
     font-weight: 600;
   }
@@ -40,8 +41,9 @@
 
   /* Hero Section */
   #home {
-    background: linear-gradient(rgba(30,30,30,0.45), rgba(30,30,30,0.45)),
-      url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+    background: linear-gradient(rgba(30, 30, 30, 0.45), rgba(30, 30, 30, 0.45)),
+      url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80")
+        no-repeat center center/cover;
     min-height: 70vh;
     display: flex;
     flex-direction: column;
@@ -73,13 +75,13 @@
     font-size: 18px;
     font-weight: 500;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,77,128,0.25);
+    box-shadow: 0 4px 10px rgba(0, 77, 128, 0.25);
   }
 
   #home a:hover {
     background: #004d80;
     color: #fff;
-    box-shadow: 0 6px 16px rgba(0,77,128,0.35);
+    box-shadow: 0 6px 16px rgba(0, 77, 128, 0.35);
   }
 
   /* Features Section */
@@ -105,14 +107,14 @@
     background: #fff;
     border-radius: 16px;
     padding: 30px 25px;
-    box-shadow: 0 8px 20px rgba(0,77,128,0.25);
+    box-shadow: 0 8px 20px rgba(0, 77, 128, 0.25);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
   }
 
   .feature-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 28px rgba(0,77,128,0.4);
+    box-shadow: 0 12px 28px rgba(0, 77, 128, 0.4);
   }
 
   .feature-card i {
@@ -159,7 +161,7 @@
     margin: 0 10px;
     background: #f9fbfd;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,77,128,0.25);
+    box-shadow: 0 8px 20px rgba(0, 77, 128, 0.25);
     padding: 25px;
     text-align: center;
     opacity: 0.6;
@@ -171,7 +173,7 @@
     transform: scale(1.05);
     opacity: 1;
     z-index: 2;
-    box-shadow: 0 12px 30px rgba(0,77,128,0.35);
+    box-shadow: 0 12px 30px rgba(0, 77, 128, 0.35);
   }
 
   .testimonial-card img {
@@ -213,20 +215,31 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
   }
 
   .carousel-btn:hover {
     background: rgba(0, 77, 128, 1);
   }
 
-  .carousel-btn.prev { left: 12px; }
-  .carousel-btn.next { right: 12px; }
+  .carousel-btn.prev {
+    left: 12px;
+  }
+  .carousel-btn.next {
+    right: 12px;
+  }
 
-  @media(max-width:768px){
-    .testimonial-card { min-width: 100%; margin: 0; }
-    .carousel-btn.prev { left: 5px; }
-    .carousel-btn.next { right: 5px; }
+  @media (max-width: 768px) {
+    .testimonial-card {
+      min-width: 100%;
+      margin: 0;
+    }
+    .carousel-btn.prev {
+      left: 5px;
+    }
+    .carousel-btn.next {
+      right: 5px;
+    }
   }
 
   /* Pricing Section */
@@ -261,14 +274,14 @@
     border-radius: 16px;
     padding: 40px 25px;
     width: 320px;
-    box-shadow: 0 8px 20px rgba(0,77,128,0.25);
+    box-shadow: 0 8px 20px rgba(0, 77, 128, 0.25);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
   }
 
   .pricing-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 14px 30px rgba(0,77,128,0.4);
+    box-shadow: 0 14px 30px rgba(0, 77, 128, 0.4);
   }
 
   .pricing-card h3 {
@@ -319,7 +332,7 @@
   .pricing-card.premium {
     border: 3px solid #004d80;
     transform: scale(1.05);
-    box-shadow: 0 16px 36px rgba(0,77,128,0.4);
+    box-shadow: 0 16px 36px rgba(0, 77, 128, 0.4);
   }
 
   .pricing-card.premium::before {
@@ -341,7 +354,10 @@
   <!-- Hero Section -->
   <section id="home">
     <h1>Africa's Leading Tour Management System</h1>
-    <p>Plan, organize, and enjoy seamless travel experiences with <strong>Nomad</strong>.</p>
+    <p>
+      Plan, organize, and enjoy seamless travel experiences with
+      <strong>Nomad</strong>.
+    </p>
     <a href="{% url 'login'%}">Get Started</a>
   </section>
 
@@ -349,8 +365,9 @@
   <section id="features">
     <h2 class="fw-bold">Why Choose Nomad?</h2>
     <p>
-      Nomad Tour Management System simplifies travel planning by combining efficiency,
-      innovation, and user-friendly tools that meet every professional travel need.
+      Nomad Tour Management System simplifies travel planning by combining
+      efficiency, innovation, and user-friendly tools that meet every
+      professional travel need.
     </p>
 
     <div class="features-grid">
@@ -381,45 +398,60 @@
   </section>
 
   <!-- Testimonials Section -->
+  <!-- Testimonials Section -->
   <section id="testimonials">
     <h2>What Our Clients Say</h2>
     <div class="testimonial-carousel-container">
       <button class="carousel-btn prev">&#10094;</button>
       <div class="testimonial-wrapper">
         <div class="testimonial-card">
-          <img src="https://randomuser.me/api/portraits/men/75.jpg">
+          <img src="https://randomuser.me/api/portraits/men/46.jpg" />
+          <p>"Nomad simplified our tour management like never before!"</p>
+          <strong>David Okoye</strong><span>Travel Coordinator</span>
+        </div>
+        <div class="testimonial-card">
+          <img src="https://randomuser.me/api/portraits/men/75.jpg" />
           <p>"Nomad made planning my trips effortless and enjoyable!"</p>
           <strong>John Doe</strong><span>Travel Enthusiast</span>
         </div>
         <div class="testimonial-card">
-          <img src="https://randomuser.me/api/portraits/women/65.jpg">
-          <p>"The system is intuitive and reliable – I love it!"</p>
-          <strong>Fatima Adebayo</strong><span>Tour Operator</span>
+          <img src="https://randomuser.me/api/portraits/women/63.jpg" />
+          <p>
+            "The platform transformed how I manage client bookings — absolutely
+            love it!"
+          </p>
+          <strong>Fatima Njoroge</strong><span>Tour Operator, Kenya</span>
         </div>
         <div class="testimonial-card">
-          <img src="https://randomuser.me/api/portraits/men/32.jpg">
-          <p>"Everything is organized in one place – saves me so much time!"</p>
-          <strong>Kwame Mensah</strong><span>Frequent Traveler</span>
+          <img src="https://randomuser.me/api/portraits/women/65.jpg" />
+          <p>
+            "Everything I need to run my travel business is right here in one
+            system!"
+          </p>
+          <strong>Grace Adebayo</strong><span>Business Owner, Nigeria</span>
         </div>
         <div class="testimonial-card">
-          <img src="https://randomuser.me/api/portraits/women/42.jpg">
-          <p>"Seamless communication and detailed itineraries make this platform amazing."</p>
-          <strong>Aisha Khan</strong><span>Adventure Blogger</span>
-        </div>
-        <div class="testimonial-card">
-          <img src="https://randomuser.me/api/portraits/men/56.jpg">
-          <p>"Nomad simplified our tour management like never before!"</p>
-          <strong>David Okoye</strong><span>Travel Coordinator</span>
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" />
+          <p>
+            "Nomad helps me stay on top of every itinerary and client update —
+            it's a lifesaver!"
+          </p>
+          <strong>Kwame Mensah</strong><span>Frequent Traveler, Ghana</span>
         </div>
       </div>
       <button class="carousel-btn next">&#10095;</button>
     </div>
   </section>
 
+  <!-- Pricing Section: Header -->
+
   <!-- Pricing Section -->
   <section id="pricing">
     <h2>Choose Your Plan</h2>
-    <p>Get started with a free trial or unlock premium features for your business.</p>
+    <p>
+      Get started with a free trial or unlock premium features for your
+      business.
+    </p>
 
     <div class="pricing-grid">
       <!-- Free Trial -->
@@ -447,14 +479,27 @@
         </ul>
         <a href="{% url 'login' %}" class="btn">Go Premium</a>
       </div>
+
+      <!-- Enterprise Plan -->
+      <div class="pricing-card">
+        <h3>Enterprise</h3>
+        <p class="price">$50 <span>/ month</span></p>
+        <ul>
+          <li>✔ All Premium features included</li>
+          <li>✔ Dedicated account manager</li>
+          <li>✔ Custom integrations</li>
+          <li>✔ On-site team training</li>
+        </ul>
+        <a href="{% url 'login' %}" class="btn">Contact Sales</a>
+      </div>
     </div>
   </section>
 </main>
 
 <script>
-  const wrapper = document.querySelector('.testimonial-wrapper');
-  const prevBtn = document.querySelector('.carousel-btn.prev');
-  const nextBtn = document.querySelector('.carousel-btn.next');
+  const wrapper = document.querySelector(".testimonial-wrapper");
+  const prevBtn = document.querySelector(".carousel-btn.prev");
+  const nextBtn = document.querySelector(".carousel-btn.next");
 
   const autoSlideInterval = 5000;
   let isAnimating = false;
@@ -465,49 +510,65 @@
 
   function updateHighlight() {
     const cards = Array.from(wrapper.children);
-    cards.forEach(c => c.classList.remove('left','center','right'));
+    cards.forEach((c) => c.classList.remove("left", "center", "right"));
     if (isSmallScreen()) {
-      cards[0].classList.add('center');
+      cards[0].classList.add("center");
     } else {
-      cards[0].classList.add('left');
-      cards[1].classList.add('center');
-      cards[2].classList.add('right');
+      cards[0].classList.add("left");
+      cards[1].classList.add("center");
+      cards[2].classList.add("right");
     }
   }
 
   function next() {
     if (isAnimating) return;
     isAnimating = true;
-    const shift = isSmallScreen() ? '-100%' : '-33.3333%';
-    wrapper.style.transition = 'transform 0.6s ease';
+    const shift = isSmallScreen() ? "-100%" : "-33.3333%";
+    wrapper.style.transition = "transform 0.6s ease";
     wrapper.style.transform = `translateX(${shift})`;
-    wrapper.addEventListener('transitionend', () => {
-      wrapper.appendChild(wrapper.firstElementChild);
-      wrapper.style.transition = 'none';
-      wrapper.style.transform = 'translateX(0)';
-      updateHighlight();
-      isAnimating = false;
-    }, { once: true });
+    wrapper.addEventListener(
+      "transitionend",
+      () => {
+        wrapper.appendChild(wrapper.firstElementChild);
+        wrapper.style.transition = "none";
+        wrapper.style.transform = "translateX(0)";
+        updateHighlight();
+        isAnimating = false;
+      },
+      { once: true }
+    );
   }
 
   function prev() {
     if (isAnimating) return;
     isAnimating = true;
     wrapper.insertBefore(wrapper.lastElementChild, wrapper.firstElementChild);
-    wrapper.style.transition = 'none';
-    wrapper.style.transform = isSmallScreen() ? 'translateX(-100%)' : 'translateX(-33.3333%)';
+    wrapper.style.transition = "none";
+    wrapper.style.transform = isSmallScreen()
+      ? "translateX(-100%)"
+      : "translateX(-33.3333%)";
     requestAnimationFrame(() => {
-      wrapper.style.transition = 'transform 0.6s ease';
-      wrapper.style.transform = 'translateX(0)';
+      wrapper.style.transition = "transform 0.6s ease";
+      wrapper.style.transform = "translateX(0)";
     });
-    wrapper.addEventListener('transitionend', () => {
-      updateHighlight();
-      isAnimating = false;
-    }, { once: true });
+    wrapper.addEventListener(
+      "transitionend",
+      () => {
+        updateHighlight();
+        isAnimating = false;
+      },
+      { once: true }
+    );
   }
 
-  nextBtn.addEventListener('click', () => { next(); resetAutoSlide(); });
-  prevBtn.addEventListener('click', () => { prev(); resetAutoSlide(); });
+  nextBtn.addEventListener("click", () => {
+    next();
+    resetAutoSlide();
+  });
+  prevBtn.addEventListener("click", () => {
+    prev();
+    resetAutoSlide();
+  });
 
   let autoSlide = setInterval(next, autoSlideInterval);
   function resetAutoSlide() {
@@ -515,12 +576,13 @@
     autoSlide = setInterval(next, autoSlideInterval);
   }
 
-  let startX = 0, isDragging = false;
-  wrapper.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX; 
+  let startX = 0,
+    isDragging = false;
+  wrapper.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
     isDragging = true;
   });
-  wrapper.addEventListener('touchend', e => {
+  wrapper.addEventListener("touchend", (e) => {
     if (!isDragging) return;
     isDragging = false;
     let endX = e.changedTouches[0].clientX;
@@ -529,7 +591,7 @@
   });
 
   updateHighlight();
-  window.addEventListener('resize', updateHighlight);
+  window.addEventListener("resize", updateHighlight);
 </script>
 
 {% endblock %}
