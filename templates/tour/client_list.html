@@ -2,25 +2,24 @@
 {% block content %}
 
 <style>
+/* Card look */
 .card {
   border-radius: 20px !important;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.16s ease-in-out;
 }
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
 }
 
-/* Disable card hover when modal is open */
+/* Disable hover when modal open */
 body.modal-open .card:hover {
   transform: none !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
   z-index: auto !important;
 }
 
-.table-hover tbody tr:hover {
-  background-color: #f9fbff;
-}
+/* Table style tweaks */
 .table th {
   font-size: 0.9rem;
   font-weight: 600;
@@ -28,123 +27,228 @@ body.modal-open .card:hover {
 }
 .table td {
   font-size: 0.95rem;
+  vertical-align: middle;
+}
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Client card for small screens */
+.client-card {
+  border-radius: 12px;
+  padding: 12px;
+}
+.client-card .client-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.client-card .client-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Modal adjustments on xs screens */
+@media (max-width: 576px) {
+  .modal-dialog { margin: 0.5rem; max-width: calc(100% - 1rem); }
+  .modal-content { border-radius: 10px; }
+}
+
+/* Visibility helpers: show table on md+, show cards on sm */
+.client-table-wrapper { display: block; }
+.client-cards-wrapper { display: none; }
+
+@media (max-width: 767.98px) {
+  .client-table-wrapper { display: none !important; } /* hide table on small */
+  .client-cards-wrapper { display: block !important; } /* show cards on small */
+}
+
+/* Ensure long words wrap */
+.break-word { word-break: break-word; overflow-wrap: anywhere; }
+
+/* Reduce gap on very small screens */
+@media (max-width: 420px) {
+  .d-flex.gap-2 > .btn { padding: .25rem .5rem; font-size: .8rem; }
+  .client-card { padding: 10px; }
 }
 </style>
 
 <div class="container-fluid py-4 bg-light min-vh-100">
   <div class="card shadow-lg border-0">
     <div class="card-body">
+
       <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <h4 class="fw-bold mb-2">Clients</h4>
-        <a href="{% url 'client_create' %}" class="btn btn-primary">
-          <i class="bi bi-plus-circle me-1"></i> Add Client
-        </a>
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="fw-bold mb-0">Clients</h4>
+        <div class="d-flex gap-2">
+          <a href="{% url 'client_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Add Client
+          </a>
+        </div>
       </div>
 
-      <!-- Search -->
-      <div class="input-group mb-3" style="max-width: 350px;">
-        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-        <input type="text" id="clientSearch" class="form-control" placeholder="Search clients...">
+      <!-- Search (full width on small, fixed on larger) -->
+      <div class="row mb-3">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input type="text" id="clientSearch" class="form-control" placeholder="Search clients...">
+          </div>
+        </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th style="width:150px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="clientTable">
-            {% for client in clients %}
+      <!-- TABLE VIEW for md+ screens -->
+      <div class="client-table-wrapper">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
               <tr>
-                <td class="fw-semibold">{{ client.first_name }} {{ client.last_name }}</td>
-                <td>{{ client.email }}</td>
-                <td>{{ client.phone_number }}</td>
-                <td>
-                  <div class="d-flex gap-2">
-                    <a href="{% url 'client_update' client.pk %}" class="btn btn-sm btn-warning">
-                      <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                    <!-- Trigger Delete Modal -->
-                    <button 
-                      class="btn btn-sm btn-danger" 
-                      data-bs-toggle="modal" 
-                      data-bs-target="#deleteClientModal{{ client.pk }}">
-                      <i class="bi bi-trash"></i> Delete
-                    </button>
-                  </div>
-                </td>
+                <th>Name</th>
+                <th class="d-none d-md-table-cell">Email</th>
+                <th class="d-none d-md-table-cell">Phone</th>
+                <th style="min-width:140px;">Actions</th>
               </tr>
-
-              <!-- Compact Delete Client Modal -->
-              <div class="modal fade" id="deleteClientModal{{ client.pk }}" tabindex="-1" aria-labelledby="deleteClientModalLabel{{ client.pk }}" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content border-0 shadow-lg rounded-3">
-                    
-                    <!-- Modal Header -->
-                    <div class="modal-header border-0 bg-light py-2">
-                      <h6 class="modal-title fw-bold text-danger d-flex align-items-center" id="deleteClientModalLabel{{ client.pk }}">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Client
-                      </h6>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="modal-body text-center py-3">
-                      <p class="mb-2">
-                        Delete <span class="fw-semibold">{{ client.first_name }} {{ client.last_name }}</span>?
-                      </p>
-                      <p class="text-muted small mb-0">This action cannot be undone.</p>
-                    </div>
-
-                    <!-- Modal Footer -->
-                    <div class="modal-footer border-0 justify-content-center py-2">
-                      <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
-                        Cancel
+            </thead>
+            <tbody id="clientTable">
+              {% for client in clients %}
+                <tr data-client-id="{{ client.pk }}">
+                  <td class="fw-semibold break-word">{{ client.first_name }} {{ client.last_name }}</td>
+                  <td class="d-none d-md-table-cell break-word">{{ client.email }}</td>
+                  <td class="d-none d-md-table-cell">{{ client.phone_number }}</td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'client_update' client.pk %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil-square"></i> Edit
+                      </a>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteClientModal{{ client.pk }}">
+                        <i class="bi bi-trash"></i> Delete
                       </button>
-                      <form method="post" action="{% url 'client_delete' client.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm px-3">
-                          <i class="bi bi-trash me-1"></i> Delete
-                        </button>
-                      </form>
                     </div>
-                    
+                  </td>
+                </tr>
+
+                <!-- Delete Modal (kept outside card list but works on any viewport) -->
+                <div class="modal fade" id="deleteClientModal{{ client.pk }}" tabindex="-1" aria-labelledby="deleteClientModalLabel{{ client.pk }}" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content border-0 shadow-lg rounded-3">
+                      <div class="modal-header border-0 bg-light py-2">
+                        <h6 class="modal-title fw-bold text-danger d-flex align-items-center" id="deleteClientModalLabel{{ client.pk }}">
+                          <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Client
+                        </h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body text-center py-3">
+                        <p class="mb-2">Delete <span class="fw-semibold">{{ client.first_name }} {{ client.last_name }}</span>?</p>
+                        <p class="text-muted small mb-0">This action cannot be undone.</p>
+                      </div>
+                      <div class="modal-footer border-0 justify-content-center py-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'client_delete' client.pk %}">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm px-3">
+                            <i class="bi bi-trash me-1"></i> Delete
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-4">
+                    <i class="bi bi-people fs-3 d-block mb-2"></i>
+                    No clients found.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div> <!-- end table wrapper -->
+
+      <!-- CARD LIST VIEW for small screens -->
+      <div class="client-cards-wrapper">
+        <div class="row g-3" id="clientCardList">
+          {% for client in clients %}
+            <div class="col-12">
+              <div class="card client-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="client-name">{{ client.first_name }} {{ client.last_name }}</div>
+                    <div class="client-meta break-word">{{ client.email }}</div>
+                    <div class="client-meta">{{ client.phone_number }}</div>
+                  </div>
+                  <div class="d-flex flex-column align-items-end ms-3">
+                    <a href="{% url 'client_update' client.pk %}" class="btn btn-sm btn-warning mb-2">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteClientModal{{ client.pk }}">
+                      <i class="bi bi-trash"></i>
+                    </button>
                   </div>
                 </div>
               </div>
-              <!-- End Delete Modal -->
+            </div>
+          {% empty %}
+            <div class="col-12">
+              <div class="text-center text-muted py-4">
+                <i class="bi bi-people fs-3 d-block mb-2"></i>
+                No clients found.
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div> <!-- end cards wrapper -->
 
-            {% empty %}
-              <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                  <i class="bi bi-people fs-3 d-block mb-2"></i>
-                  No clients found.
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
     </div>
   </div>
 </div>
 
 <script>
-// Simple client search filter
-document.getElementById('clientSearch').addEventListener('keyup', function() {
-  let filter = this.value.toLowerCase();
-  let rows = document.querySelectorAll('#clientTable tr');
-  rows.forEach(row => {
-    let text = row.textContent.toLowerCase();
-    row.style.display = text.includes(filter) ? '' : 'none';
+// Search filter: supports both table rows and card items
+(function() {
+  const searchInput = document.getElementById('clientSearch');
+  const tableRows = () => Array.from(document.querySelectorAll('#clientTable tr[data-client-id]'));
+  const cardRows = () => Array.from(document.querySelectorAll('#clientCardList .card'));
+
+  function normalize(text) {
+    return (text || '').toLowerCase();
+  }
+
+  function filter() {
+    const q = normalize(searchInput.value.trim());
+    if (!q) {
+      // show all
+      tableRows().forEach(r => r.style.display = '');
+      cardRows().forEach(c => c.closest('.col-12').style.display = '');
+      return;
+    }
+
+    // table
+    tableRows().forEach(row => {
+      const text = normalize(row.textContent);
+      row.style.display = text.includes(q) ? '' : 'none';
+    });
+
+    // cards
+    cardRows().forEach(card => {
+      const text = normalize(card.textContent);
+      card.closest('.col-12').style.display = text.includes(q) ? '' : 'none';
+    });
+  }
+
+  // Debounce for better performance on slower devices
+  let t;
+  searchInput.addEventListener('input', function() {
+    clearTimeout(t);
+    t = setTimeout(filter, 150);
   });
-});
+
+  // Also run once on load in case there's pre-filled search
+  document.addEventListener('DOMContentLoaded', filter);
+})();
 </script>
 
 {% endblock %}
